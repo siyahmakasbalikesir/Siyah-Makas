@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Siyah Makas Berber</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: #070707;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* ÜST MENÜ */
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 88px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 7%;
+
+            background: rgba(5, 5, 5, 0.94);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-icon {
+            width: 47px;
+            height: 47px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid #777;
+            border-radius: 50%;
+
+            font-size: 25px;
+        }
+
+        .logo-text strong {
+            display: block;
+
+            font-family: Georgia, serif;
+            font-size: 20px;
+            letter-spacing: 3px;
+        }
+
+        .logo-text span {
+            display: block;
+
+            margin-top: 5px;
+
+            color: #999;
+
+            font-size: 9px;
+            letter-spacing: 6px;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 35px;
+        }
+
+        nav a {
+            position: relative;
+
+            color: #c8c8c8;
+
+            font-size: 13px;
+            letter-spacing: 1px;
+
+            transition: 0.3s;
+        }
+
+        nav a::after {
+            content: "";
+
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+
+            width: 0;
+            height: 1px;
+
+            background: white;
+
+            transition: 0.3s;
+        }
+
+        nav a:hover {
+            color: white;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .phone {
+            padding: 13px 20px;
+
+            border: 1px solid #777;
+
+            font-size: 12px;
+            letter-spacing: 1px;
+
+            transition: 0.3s;
+        }
+
+        .phone:hover {
+            background: white;
+            color: black;
+        }
+
+        /* ANA EKRAN */
+
+        .hero {
+            position: relative;
+
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+
+            padding: 140px 8% 80px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(0,0,0,0.92) 0%,
+                    rgba(0,0,0,0.72) 35%,
+                    rgba(0,0,0,0.25) 70%,
+                    rgba(0,0,0,0.5) 100%
+                ),
+                url("https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=2000&q=90");
+
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero::after {
+            content: "";
+
+            position: absolute;
+            left: 0;
+            bottom: 0;
+
+            width: 100%;
+            height: 180px;
+
+            background:
+                linear-gradient(
+                    transparent,
+                    #070707
+                );
+
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+
+            max-width: 720px;
+        }
+
+        .hero-top-text {
+            margin-bottom: 18px;
+
+            color: #d0d0d0;
+
+            font-size: 13px;
+            font-weight: bold;
+
+            letter-spacing: 7px;
+        }
+
+        .hero-title {
+            font-family: Georgia, "Times New Roman", serif;
+
+            font-size: clamp(36px, 4vw, 58px);
+
+            line-height: 0.88;
+
+            letter-spacing: -3px;
+
+            margin-bottom: 28px;
+        }
+
+        .hero-title span {
+            display: block;
+        }
+
+        .hero-description {
+            max-width: 540px;
+
+            color: #c5c5c5;
+
+            font-size: 16px;
+            line-height: 1.8;
+
+            margin-bottom: 36px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+
+            flex-wrap: wrap;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 165px;
+
+            padding: 16px 25px;
+
+            border: 1px solid white;
+
+            font-size: 12px;
+            font-weight: bold;
+
+            letter-spacing: 2px;
+
+            transition: 0.3s;
+        }
+
+        .button-white {
+            background: white;
+            color: black;
+        }
+
+        .button-black {
+            background: rgba(0,0,0,0.2);
+            color: white;
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+        }
+
+        /* ALTTA KÜÇÜK BİLGİLER */
+
+        .hero-info {
+            position: absolute;
+
+            left: 8%;
+            right: 8%;
+            bottom: 35px;
+
+            z-index: 3;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            color: #888;
+
+            font-size: 11px;
+
+            letter-spacing: 2px;
+        }
+
+        .hero-info-right {
+            display: flex;
+            gap: 30px;
+        }
+
+        /* TELEFON */
+
+        @media (max-width: 950px) {
+
+            header {
+                padding: 0 5%;
+            }
+
+            nav {
+                display: none;
+            }
+
+            .phone {
+                display: none;
+            }
+
+            .hero {
+                padding-left: 7%;
+                padding-right: 7%;
+
+                background-position: 65% center;
+            }
+
+            .hero-title {
+                font-size: clamp(42px, 5vw, 72px);
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            header {
+                height: 75px;
+            }
+
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+
+                font-size: 21px;
+            }
+
+            .logo-text strong {
+                font-size: 16px;
+            }
+
+            .logo-text span {
+                font-size: 7px;
+            }
+
+            .hero {
+                min-height: 100svh;
+
+                padding-top: 120px;
+
+                background-position: 68% center;
+            }
+
+            .hero-top-text {
+                font-size: 10px;
+                letter-spacing: 5px;
+            }
+
+            .hero-title {
+                font-size: 58px;
+                line-height: 0.92;
+            }
+
+            .hero-description {
+                font-size: 14px;
+            }
+
+            .button {
+                width: 100%;
+            }
+
+            .hero-info {
+                display: none;
+            }
+
+        }
+/* TELEFONDA BAŞLIK BOYUTU */
+@media (max-width: 600px) {
+    .hero-title {
+        font-size: 34px;
+        line-height: 0.95;
+        letter-spacing: -1px;
+    }
+}/* HİZMETLER */
+
+.services-section {
+    padding: 110px 8%;
+    background: #070707;
+}
+
+.services-header {
+    margin-bottom: 55px;
+}
+
+.services-header p {
+    color: #888;
+    font-size: 11px;
+    letter-spacing: 6px;
+    margin-bottom: 12px;
+}
+
+.services-header h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(38px, 5vw, 64px);
+    letter-spacing: 1px;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: #2a2a2a;
+    border: 1px solid #2a2a2a;
+}
+
+.service-box {
+    position: relative;
+    min-height: 260px;
+    padding: 38px 32px;
+    background: #0d0d0d;
+    transition: 0.35s;
+}
+
+.service-box:hover {
+    background: #151515;
+    transform: translateY(-4px);
+}
+
+.service-box span {
+    display: block;
+    color: #555;
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-bottom: 45px;
+}
+
+.service-box h3 {
+    font-family: Georgia, serif;
+    font-size: 25px;
+    margin-bottom: 15px;
+}
+
+.service-box p {
+    color: #999;
+    line-height: 1.7;
+    font-size: 14px;
+    max-width: 320px;
+}
+
+.service-box strong {
+    display: block;
+    margin-top: 25px;
+    font-size: 18px;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 900px) {
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .services-section {
+        padding: 80px 6%;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .service-box {
+        min-height: auto;
+    }
+}/* HAKKIMIZDA */
+
+.section-kicker {
+    color: #888;
+    font-size: 11px;
+    letter-spacing: 6px;
+    margin-bottom: 15px;
+}
+
+.about-section {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    min-height: 650px;
+    background: #0b0b0b;
+}
+
+.about-photo {
+    background:
+        linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.35)),
+        url("https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1400&q=90");
+
+    background-size: cover;
+    background-position: center;
+}
+
+.about-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 10%;
+}
+
+.about-text h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(40px, 5vw, 68px);
+    margin-bottom: 30px;
+}
+
+.about-text p:not(.section-kicker) {
+    color: #aaa;
+    font-size: 15px;
+    line-height: 1.9;
+    margin-bottom: 20px;
+}
+
+
+/* GALERİ */
+
+.gallery-section {
+    padding: 110px 8%;
+    background: #070707;
+}
+
+.gallery-header {
+    margin-bottom: 50px;
+}
+
+.gallery-header p {
+    color: #888;
+    font-size: 11px;
+    letter-spacing: 6px;
+    margin-bottom: 12px;
+}
+
+.gallery-header h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(40px, 5vw, 65px);
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.gallery-grid img {
+    width: 100%;
+    height: 330px;
+    object-fit: cover;
+    filter: grayscale(25%);
+    transition: 0.4s;
+}
+
+.gallery-grid img:hover {
+    filter: grayscale(0);
+    transform: scale(1.015);
+}
+
+
+/* RANDEVU */
+
+.appointment-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 70px;
+    padding: 110px 8%;
+    background: #101010;
+}
+
+.appointment-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.appointment-left h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(42px, 5vw, 70px);
+    margin-bottom: 25px;
+}
+
+.appointment-left > p:last-child {
+    color: #999;
+    line-height: 1.8;
+    max-width: 470px;
+}
+
+.appointment-box {
+    background: #080808;
+    border: 1px solid #292929;
+    padding: 40px;
+}
+
+.appointment-box label {
+    display: block;
+    margin: 18px 0 9px;
+    color: #aaa;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+.appointment-box select {
+    width: 100%;
+    padding: 15px;
+
+    background: #111;
+    color: white;
+
+    border: 1px solid #333;
+    outline: none;
+}
+
+.date-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.appointment-box button {
+    width: 100%;
+    margin-top: 27px;
+    padding: 17px;
+
+    background: white;
+    color: black;
+
+    border: 1px solid white;
+
+    font-weight: bold;
+    letter-spacing: 1px;
+
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.appointment-box button:hover {
+    background: transparent;
+    color: white;
+}
+
+
+/* İLETİŞİM */
+
+.contact-section {
+    padding: 110px 8%;
+    background: #070707;
+}
+
+.contact-title p {
+    color: #888;
+    font-size: 11px;
+    letter-spacing: 6px;
+    margin-bottom: 12px;
+}
+
+.contact-title h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(40px, 5vw, 65px);
+    margin-bottom: 55px;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    border-top: 1px solid #292929;
+    border-bottom: 1px solid #292929;
+}
+
+.contact-item {
+    padding: 40px 30px;
+    border-right: 1px solid #292929;
+}
+
+.contact-item:last-child {
+    border-right: none;
+}
+
+.contact-item span {
+    color: #555;
+    font-size: 11px;
+}
+
+.contact-item h3 {
+    margin: 25px 0 12px;
+    font-family: Georgia, serif;
+}
+
+.contact-item p {
+    color: #999;
+    line-height: 1.7;
+}
+
+.contact-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.contact-buttons a {
+    padding: 15px 25px;
+    border: 1px solid #555;
+
+    font-size: 12px;
+    letter-spacing: 2px;
+
+    transition: 0.3s;
+}
+
+.contact-buttons a:hover {
+    background: white;
+    color: black;
+}
+
+
+/* FOOTER */
+
+footer {
+    display: flex;
+    justify-content: space-between;
+
+    padding: 30px 8%;
+
+    background: #030303;
+    border-top: 1px solid #222;
+
+    color: #555;
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+
+/* TABLET */
+
+@media (max-width: 900px) {
+
+    .about-section {
+        grid-template-columns: 1fr;
+    }
+
+    .about-photo {
+        min-height: 500px;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .appointment-section {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-item {
+        border-right: none;
+        border-bottom: 1px solid #292929;
+    }
+}
+
+
+/* TELEFON */
+
+@media (max-width: 600px) {
+
+    .about-photo {
+        min-height: 380px;
+    }
+
+    .about-text {
+        padding: 70px 7%;
+    }
+
+    .gallery-section,
+    .appointment-section,
+    .contact-section {
+        padding: 80px 6%;
+    }
+
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gallery-grid img {
+        height: 280px;
+    }
+
+    .appointment-box {
+        padding: 25px 18px;
+    }
+
+    .date-row {
+        grid-template-columns: 1fr;
+    }
+
+    footer {
+        flex-direction: column;
+        gap: 10px;
+    }
+}.menu-toggle {
+    display: none;
+    background: transparent;
+    color: white;
+    border: 1px solid #555;
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+@media (max-width: 950px) {
+
+    .menu-toggle {
+        display: block;
+    }
+
+    nav {
+        display: none;
+        position: absolute;
+        top: 88px;
+        left: 0;
+        width: 100%;
+
+        background: #080808;
+        border-top: 1px solid #222;
+        border-bottom: 1px solid #222;
+
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+
+        padding: 10px 0;
+    }
+
+    nav.active {
+        display: flex;
+    }
+
+    nav a {
+        width: 100%;
+        padding: 17px 7%;
+        border-bottom: 1px solid #171717;
+    }
+
+    nav a:last-child {
+        border-bottom: none;
+    }
+}.menu-toggle {
+    display: none;
+    background: transparent;
+    color: white;
+    border: 1px solid #555;
+    width: 44px;
+    height: 44px;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10000;
+}
+
+@media (max-width: 950px) {
+    .menu-toggle {
+        display: block !important;
+    }
+
+    .phone {
+        display: none !important;
+    }
+
+    #mobileMenu {
+        display: none;
+    }
+
+    #mobileMenu.active {
+        display: flex !important;
+    }
+}.map-box {
+    margin-top: 45px;
+    width: 100%;
+    height: 380px;
+    border: 1px solid #292929;
+    overflow: hidden;
+}
+
+.map-box iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    filter: grayscale(70%) brightness(75%);
+}
+
+@media (max-width: 600px) {
+    .map-box {
+        height: 300px;
+    }
+}
+    </style>
+</head>
+
+<body>
+  <div class="logo">
+        ...
+    </div>
+
+<header>
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            ✂
+        </div>
+
+        <div class="logo-text">
+            <strong>SİYAH MAKAS</strong>
+            <span>BERBER</span>
+        </div>
+
+    </div>
+
+    <<nav id="mobileMenu">
+    <a href="#anasayfa">ANA SAYFA</a>
+    <a href="#hakkimizda">HAKKIMIZDA</a>
+    <a href="#hizmetler">HİZMETLERİMİZ</a>
+    <a href="#galeri">GALERİ</a>
+    <a href="#iletisim">İLETİŞİM</a>
+</nav>
+    </nav>
+    <a class="phone" href="tel:+905439567100">
+        ☎ 0543 956 71 00
+    </a>
+<button class="menu-toggle" onclick="menuAcKapat()">☰</button>
+</header>
+
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="hero-top-text">
+            TARZINIZI YANSITIN
+        </div>
+
+        <h1 class="hero-title">
+            <span>SİYAH MAKAS</span>
+            <span>ERKEK KUAFÖR
+            </span>
+        </h1>
+
+        <p class="hero-description">
+            Klasik berberlik geleneğini modern stil ile buluşturuyoruz.
+            Kendine özgü tarzını keşfet, görünümünü Siyah Makas ile tamamla.
+        </p>
+
+        <div class="hero-buttons">
+
+            <a href="#randevu" class="button button-white">
+                RANDEVU AL
+            </a>
+
+           <a href="#hizmetler" class="button button-black">
+                HİZMETLERİMİZ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="hero-info">
+
+        <div>
+            BALIKESİR / ALTIEYLÜL
+        </div>
+
+        <div class="hero-info-right">
+            <span>@SIYAH_MAKAS</span>
+            <span>EST. 2026</span>
+        </div>
+
+    </div>
+
+</section><section class="services-section" id="hizmetler">
+<section class="about-section" id="hakkimizda">
+
+    <div class="about-photo"></div>
+
+    <div class="about-text">
+        <p class="section-kicker">SİYAH MAKAS</p>
+        <h2>HAKKIMIZDA</h2>
+
+        <p>
+            Klasik berberlik kültürünü modern erkek stil anlayışıyla
+            bir araya getiriyoruz. Saç kesiminden sakal tasarımına,
+            bakım uygulamalarından kişisel stile kadar her detayda
+            özenli ve kaliteli hizmet sunuyoruz.
+        </p>
+
+        <p>
+            Siyah Makas'ta amacımız sadece saç kesmek değil,
+            müşterilerimizin kendine en uygun görünümü bulmasını sağlamak.
+        </p>
+    </div>
+
+</section>
+
+
+<section class="gallery-section" id="galeri">
+
+    <div class="gallery-header">
+        <p>DETAYLARDA TARZ</p>
+        <h2>GALERİ</h2>
+    </div>
+
+    <div class="gallery-grid">
+
+        <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1000&q=85" alt="Berber">
+
+        <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=1000&q=85" alt="Saç kesimi">
+
+        <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=1000&q=85" alt="Sakal tıraşı">
+
+        <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1000&q=85" alt="Berber salonu">
+
+        <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=1000&q=85" alt="Erkek kuaförü">
+
+        <img src="https://images.unsplash.com/photo-1622296089863-eb7fc530daa8?auto=format&fit=crop&w=1000&q=85" alt="Berber hizmeti">
+
+    </div>
+
+</section>
+
+
+<section class="appointment-section" id="randevu">
+
+    <div class="appointment-left">
+        <p class="section-kicker">RANDEVUNU OLUŞTUR</p>
+        <h2>RANDEVU AL</h2>
+
+        <p>
+            Hizmetini, tarihini ve saatini seç.
+            Randevu bilgilerin WhatsApp üzerinden bize hazır mesaj olarak gelsin.
+        </p>
+    </div>
+
+    <div class="appointment-box">
+
+        <label>Hizmet</label>
+
+        <select id="hizmet">
+            <option value="">Hizmet seçiniz</option>
+            <option>Saç Kesimi - 400 TL</option>
+            <option>Sakal Tıraşı - 200 TL</option>
+            <option>Saç + Sakal - 500 TL</option>
+            <option>Yıkama - 100 TL</option>
+            <option>Saç Boyama - 500 TL</option>
+            <option>Cilt Bakımı - 500 TL</option>
+        </select>
+
+        <label>Tarih</label>
+
+        <div class="date-row">
+
+            <select id="gun">
+                <option value="">Gün</option>
+                <option>01</option>
+                <option>02</option>
+                <option>03</option>
+                <option>04</option>
+                <option>05</option>
+                <option>06</option>
+                <option>07</option>
+                <option>08</option>
+                <option>09</option>
+                <option>10</option>
+                <option>11</option>
+                <option>12</option>
+                <option>13</option>
+                <option>14</option>
+                <option>15</option>
+                <option>16</option>
+                <option>17</option>
+                <option>18</option>
+                <option>19</option>
+                <option>20</option>
+                <option>21</option>
+                <option>22</option>
+                <option>23</option>
+                <option>24</option>
+                <option>25</option>
+                <option>26</option>
+                <option>27</option>
+                <option>28</option>
+                <option>29</option>
+                <option>30</option>
+                <option>31</option>
+            </select>
+
+            <select id="ay">
+                <option value="">Ay</option>
+                <option value="01">Ocak</option>
+                <option value="02">Şubat</option>
+                <option value="03">Mart</option>
+                <option value="04">Nisan</option>
+                <option value="05">Mayıs</option>
+                <option value="06">Haziran</option>
+                <option value="07">Temmuz</option>
+                <option value="08">Ağustos</option>
+                <option value="09">Eylül</option>
+                <option value="10">Ekim</option>
+                <option value="11">Kasım</option>
+                <option value="12">Aralık</option>
+            </select>
+
+            <select id="yil">
+                <option value="">Yıl</option>
+                <option>2026</option>
+                <option>2027</option>
+            </select>
+
+        </div>
+
+        <label>Saat</label>
+
+        <select id="saat">
+            <option value="">Saat seçiniz</option>
+            <option>09:00</option>
+            <option>10:00</option>
+            <option>11:00</option>
+            <option>12:00</option>
+            <option>13:00</option>
+            <option>14:00</option>
+            <option>15:00</option>
+            <option>16:00</option>
+            <option>17:00</option>
+            <option>18:00</option>
+            <option>19:00</option>
+        </select>
+
+        <button onclick="randevuGonder()">
+            WHATSAPP'TAN RANDEVU GÖNDER
+        </button>
+
+    </div>
+
+</section>
+
+
+<section class="contact-section" id="iletisim">
+
+    <div class="contact-title">
+        <p>İLETİŞİM</p>
+        <h2>BİZE ULAŞIN</h2>
+    </div>
+
+    <div class="contact-grid">
+
+        <div class="contact-item">
+            <span>01</span>
+            <h3>TELEFON</h3>
+            <p>0543 956 71 00</p>
+        </div>
+
+        <div class="contact-item">
+            <span>02</span>
+            <h3>ADRES</h3>
+            <p>
+                Bahçelievler Mahallesi<br>
+                Mehmetçik Caddesi 54/B<br>
+                Altıeylül / Balıkesir
+            </p>
+        </div>
+
+        <div class="contact-item">
+            <span>03</span>
+            <h3>INSTAGRAM</h3>
+            <p>@siyah_makas</p>
+        </div>
+
+    </div>
+
+    <div class="contact-buttons"><div class="map-box">
+    <iframe
+        src="https://www.google.com/maps?q=Bahçelievler+Mahallesi+Mehmetçik+Caddesi+54%2FB+Altıeylül+Balıkesir&output=embed"
+        loading="lazy"
+        allowfullscreen>
+    </iframe>
+</div>
+
+
+        <a href="https://wa.me/905439567100" target="_blank">
+            WHATSAPP
+        </a>
+
+        <a href="https://www.instagram.com/siyah_makas/" target="_blank">
+            INSTAGRAM
+        </a>
+
+        <a href="https://www.google.com/maps/search/?api=1&query=Bahçelievler+Mahallesi+Mehmetçik+Caddesi+54%2FB+Altıeylül+Balıkesir" target="_blank">
+            YOL TARİFİ
+        </a>
+
+    </div>
+
+</section>
+
+
+<footer>
+    <span>© 2026 SİYAH MAKAS BERBER</span>
+    <span>BALIKESİR / ALTIEYLÜL</span>
+</footer>
+    <div class="services-header">
+        <p>ÖZENLİ İŞÇİLİK</p>
+        <h2>HİZMETLERİMİZ</h2>
+    </div>
+
+    <div class="services-grid">
+
+        <div class="service-box">
+            <span>01</span>
+            <h3>SAÇ KESİMİ</h3>
+            <p>Yüz hatlarına ve tarzına uygun modern erkek saç kesimi.</p>
+            <strong>400 TL</strong>
+        </div>
+
+        <div class="service-box">
+            <span>02</span>
+            <h3>SAKAL TIRAŞI</h3>
+            <p>Temiz hatlar, profesyonel şekillendirme ve detaylı bakım.</p>
+            <strong>200 TL</strong>
+        </div>
+
+        <div class="service-box">
+            <span>03</span>
+            <h3>SAÇ + SAKAL</h3>
+            <p>Saç ve sakalın birlikte tamamlandığı komple görünüm.</p>
+            <strong>500 TL</strong>
+        </div>
+
+        <div class="service-box">
+            <span>04</span>
+            <h3>YIKAMA</h3>
+            <p>Saç temizliği ve kesim sonrası ferah bakım.</p>
+            <strong>100 TL</strong>
+        </div>
+
+        <div class="service-box">
+            <span>05</span>
+            <h3>SAÇ BOYAMA</h3>
+            <p>Doğal ve modern görünüm için profesyonel saç boyama.</p>
+            <strong>500 TL</strong>
+        </div>
+
+        <div class="service-box">
+            <span>06</span>
+            <h3>CİLT BAKIMI</h3>
+            <p>Erkeklere özel yüz temizliği ve bakım uygulaması.</p>
+            <strong>500 TL</strong>
+        </div>
+
+    </div>
+
+</section>
+<script>
+function randevuGonder() {
+
+    const hizmet = document.getElementById("hizmet").value;
+    const gun = document.getElementById("gun").value;
+    const ay = document.getElementById("ay").value;
+    const yil = document.getElementById("yil").value;
+    const saat = document.getElementById("saat").value;
+
+    if (
+        hizmet === "" ||
+        gun === "" ||
+        ay === "" ||
+        yil === "" ||
+        saat === ""
+    ) {
+        alert("Lütfen hizmet, tarih ve saat seçiniz.");
+        return;
+    }
+
+    const secilenTarih = new Date(
+        Number(yil),
+        Number(ay) - 1,
+        Number(gun)
+    );
+
+    const bugun = new Date();
+    bugun.setHours(0, 0, 0, 0);
+
+    if (secilenTarih < bugun) {
+        alert("Geçmiş bir tarihe randevu alamazsınız.");
+        return;
+    }
+
+    const tarih = gun + "." + ay + "." + yil;
+
+    const mesaj =
+`Merhaba Siyah Makas, randevu almak istiyorum.
+
+Hizmet: ${hizmet}
+Tarih: ${tarih}
+Saat: ${saat}`;
+
+    const telefon = "905439567100";
+
+    const link =
+        "https://wa.me/" +
+        telefon +
+        "?text=" +
+        encodeURIComponent(mesaj);
+
+    window.open(link, "_blank");
+}
+</script>
+<script>
+function menuAcKapat() {
+    const menu = document.getElementById("mobileMenu");
+    menu.classList.toggle("active");
+}
+
+document.querySelectorAll("#mobileMenu a").forEach(link => {
+    link.addEventListener("click", function() {
+        document.getElementById("mobileMenu").classList.remove("active");
+    });
+});
+</script>
+
+</body>
+</html>
