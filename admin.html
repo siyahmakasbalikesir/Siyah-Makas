@@ -167,7 +167,7 @@
 :focus-visible{outline:2px solid #f4c542;outline-offset:3px}.filtreler button[aria-pressed="true"]{border-color:#f4c542;color:#f4c542}
 .link-box{width:100%;font-size:13px;margin-top:10px}.durum.tamamlandi{color:#95c9ff}.durum.gelmedi{color:#ffb181}
 @media(max-width:600px){.container{margin:24px auto}h1{font-size:26px;letter-spacing:1px}.login-box{padding:22px}.randevu{padding:16px}.filtreler button{flex:1 1 42%;font-size:12px;padding:10px}.topbar .subtitle{margin-bottom:5px}}
-</style>
+#alarmAlan{padding:20px;border:1px solid #555;margin:20px 0;background:#151515}#alarmAlan.alarm-var{border:2px solid #ffc34a;background:#2b200c}#alarmAlan label{display:block;margin-top:12px}#sesSeviyesi{max-width:360px;padding:0;accent-color:#ffc34a}#alarmDurum{line-height:1.65;color:#ffe09b}.alarm-not{color:#bbb;font-size:13px;line-height:1.6}#sesYuzde{margin-left:8px}</style>
 </head>
 
 <body>
@@ -211,9 +211,7 @@
     <button onclick="filtrele('iptal')">İPTAL EDİLEN</button><button onclick="filtrele('tamamlandi')">TAMAMLANAN</button>
 </div>
 <label for="arama">Müşteri veya telefon ara</label><input id="arama" type="search" placeholder="Ad veya telefon"><label for="tarihFiltre">Tarihe göre filtrele</label><input id="tarihFiltre" type="date"><button type="button" onclick="filtreleriTemizle()">FİLTRELERİ TEMİZLE</button>
-<button onclick="bildirimSesiniAc()" class="ses-btn" id="sesBtn">
-    🔔 BİLDİRİM SESİNİ AÇ
-</button>
+<section id="alarmAlan" aria-label="Randevu alarmı"><button onclick="bildirimSesiniAc()" class="ses-btn" id="sesBtn">ALARM SESİNİ AÇ</button><label for="sesSeviyesi">Alarm sesi <output id="sesYuzde" for="sesSeviyesi">100%</output></label><input type="range" id="sesSeviyesi" min="30" max="100" value="100" step="5"><p id="alarmDurum" role="status" aria-live="polite"></p><button type="button" onclick="filtreleriTemizle();filtrele('bekliyor')">BEKLEYEN TALEPLERİ GÖSTER</button><p class="alarm-not">Paneli açık tutun ve cihazın sesini yükseltin. Ses, cihazınızın ses düzeyine bağlıdır.</p></section>
         <button onclick="yenile()">YENİLE</button><p id="baglantiDurum" role="status"></p><div id="randevular">
             Randevular yükleniyor...
         </div>
@@ -242,16 +240,16 @@ let audioCtx=null,sesAktif=false,islemde=false,randevuKanali=null;
 const durumlar={bekliyor:'BEKLİYOR',onaylandi:'ONAYLANDI',iptal:'İPTAL EDİLDİ',tamamlandi:'TAMAMLANDI',gelmedi:'GELMEDİ'};
 $('loginForm').addEventListener('submit',girisYap);
 async function girisYap(e){e?.preventDefault();$('loginBtn').disabled=true;$('mesaj').textContent='Giriş yapılıyor…';try{if(!supabaseClient)throw Error();const {error}=await supabaseClient.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;$('password').value='';await paneliAc();}catch(e){$('mesaj').textContent='Giriş yapılamadı. E-posta, şifre ve bağlantınızı kontrol edin.';}finally{$('loginBtn').disabled=false;}}
-async function paneliAc(){try{const allowed=await rpc('sk_admin_mi');if(!allowed){$('mesaj').textContent=hataMetinleri.SK_AUTH;await supabaseClient.auth.signOut();return;}oturumAcik=true;$('login').hidden=true;$('panel').style.display='block';$('panel').hidden=false;await yenile();bildirimleriBaslat();clearInterval(yenileTimer);yenileTimer=setInterval(()=>{if(oturumAcik&&!document.hidden)yenile();},15000);}catch(e){$('mesaj').textContent=hataYaz(e);}}
-function paneliKapat(){oturumAcik=false;oncekiBekleyen=null;if(randevuKanali){supabaseClient.removeChannel(randevuKanali);randevuKanali=null;}clearInterval(yenileTimer);yenileTimer=null;$('panel').hidden=true;$('login').hidden=false;$('randevular').replaceChildren();$('adminYorumlar').replaceChildren();}
+async function paneliAc(){try{const allowed=await rpc('sk_admin_mi');if(!allowed){$('mesaj').textContent=hataMetinleri.SK_AUTH;await supabaseClient.auth.signOut();return;}oturumAcik=true;$('login').hidden=true;$('panel').style.display='block';$('panel').hidden=false;await yenile();bildirimleriBaslat();clearInterval(yenileTimer);yenileTimer=setInterval(()=>{if(oturumAcik){if(document.hidden)alarmDurumunuYenile();else yenile();}},15000);}catch(e){$('mesaj').textContent=hataYaz(e);}}
+function paneliKapat(){oturumAcik=false;++alarmSorgu;bekleyenSayisi=null;alarmiDurdur();sesKaynakDurdur(testKaynak);testKaynak=null;alarmGorunumu();if(randevuKanali){supabaseClient.removeChannel(randevuKanali);randevuKanali=null;}clearInterval(yenileTimer);yenileTimer=null;$('panel').hidden=true;$('login').hidden=false;$('randevular').replaceChildren();$('adminYorumlar').replaceChildren();}
 async function cikisYap(){try{const {error}=await supabaseClient.auth.signOut();if(error)throw error;paneliKapat();$('mesaj').textContent='Çıkış yapıldı.';}catch(e){$('panelMesaj').textContent='Çıkış yapılamadı. Tekrar deneyin.';}}
 function filtrele(value){filtre=value;sayfa=0;randevulariGetir();}
 function filtreleriTemizle(){$('arama').value='';$('tarihFiltre').value='';filtrele('gelecek');}
 let aramaTimer; $('arama').addEventListener('input',()=>{clearTimeout(aramaTimer);aramaTimer=setTimeout(()=>{sayfa=0;randevulariGetir();},300);});$('tarihFiltre').addEventListener('change',()=>{sayfa=0;randevulariGetir();});
 function sayfaDegistir(n){sayfa=Math.max(0,sayfa+n);randevulariGetir();}
-let oncekiBekleyen=null;
+
 async function randevulariGetir(){if(!oturumAcik)return;const req=++listeIstegi;try{const data=await rpc('sk_admin_liste',{p_filtre:filtre,p_arama:$('arama').value.trim(),p_tarih:$('tarihFiltre').value||null,p_sayfa:sayfa});if(req!==listeIstegi||!oturumAcik)return;toplam=data.total;const rows=data.rows||[];if(!rows.length&&sayfa>0){sayfa--;return randevulariGetir();}$('ozet').textContent=`Bugün ${data.bugun} randevu · ${data.bekleyen} bekleyen talep · ${toplam} eşleşme`;
-if(oncekiBekleyen!==null&&data.bekleyen>oncekiBekleyen){bildirimSesiCal();$('panelMesaj').textContent='Yeni bekleyen randevu talebi var.';}oncekiBekleyen=data.bekleyen;
+
 $('randevular').innerHTML=rows.length?rows.map(kartHtml).join(''):'<p>Bu filtrede randevu bulunmuyor.</p>';$('sayfaBilgi').textContent=`Sayfa ${sayfa+1} / ${Math.max(1,Math.ceil(toplam/20))}`;$('onceki').disabled=sayfa===0;$('sonraki').disabled=(sayfa+1)*20>=toplam;document.querySelectorAll('.filtreler button').forEach(b=>b.setAttribute('aria-pressed',String(b.getAttribute('onclick').includes("'"+filtre+"'"))));$('baglantiDurum').textContent='Güncel · Panel açıkken 15 saniyede bir yenilenir.';
 }catch(e){if(req===listeIstegi){$('panelMesaj').textContent=hataYaz(e);$('baglantiDurum').textContent='Bağlantı kurulamadı. Gösterilen kayıtlar güncel olmayabilir.';}}}
 function kartHtml(r){const d=Object.hasOwn(durumlar,r.durum)?r.durum:'bekliyor',id=guvenli(String(r.id)),now=trSimdi(),past=`${r.tarih} ${r.saat.slice(0,5)}`<`${now.tarih} ${now.saat}`;let buttons='';const btn=(to,text,cls='onayla')=>`<button class="${cls}" data-id="${id}" data-old="${d}" data-to="${to}">${text}</button>`;
@@ -261,14 +259,70 @@ if(d==='iptal'&&!past)buttons+=btn('bekliyor','TEKRAR BEKLEMEYE AL');
 if(d==='tamamlandi')buttons+=`<button data-review="${id}">YORUM BAĞLANTISI</button>`;
 const tel=telefonDuzenle(r.telefon||'');return `<article class="randevu"><p><strong>Müşteri:</strong> ${guvenli(r.musteri_adi)}</p><p><strong>Telefon:</strong> ${tel?`<a href="tel:${tel}">${guvenli(r.telefon)}</a>`:guvenli(r.telefon)}</p><p><strong>Hizmet:</strong> ${guvenli(r.hizmet)}</p><p><strong>Tarih:</strong> ${tarihYaz(r.tarih)} · ${guvenli(r.saat.slice(0,5))}${past?' · Geçmiş':''}</p><span class="durum ${d}">${durumlar[d]}</span><div>${buttons}</div><div id="link-${id}"></div></article>`;}
 $('randevular').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b||islemde)return;if(b.dataset.to)await durumDegistir(b);if(b.dataset.review)await yorumBaglantisi(b);});
-async function durumDegistir(b){if(b.dataset.to==='iptal'&&!confirm('Bu randevu iptal edilsin mi?'))return;islemde=true;b.disabled=true;try{await rpc('sk_durum_degistir',{p_id:b.dataset.id,p_eski:b.dataset.old,p_yeni:b.dataset.to});$('panelMesaj').textContent='Randevu güncellendi.';await randevulariGetir();}catch(e){$('panelMesaj').textContent=hataYaz(e);}finally{islemde=false;b.disabled=false;}}
+async function durumDegistir(b){if(b.dataset.to==='iptal'&&!confirm('Bu randevu iptal edilsin mi?'))return;islemde=true;b.disabled=true;try{await rpc('sk_durum_degistir',{p_id:b.dataset.id,p_eski:b.dataset.old,p_yeni:b.dataset.to});$('panelMesaj').textContent='Randevu güncellendi.';await Promise.all([randevulariGetir(),alarmDurumunuYenile()]);}catch(e){$('panelMesaj').textContent=hataYaz(e);}finally{islemde=false;b.disabled=false;}}
 async function yorumBaglantisi(b){b.disabled=true;try{const token=await rpc('sk_yorum_daveti',{p_id:b.dataset.review});const url=new URL('index.html',location.href);url.searchParams.set('yorum',token);url.hash='yorumlar';const box=$('link-'+b.dataset.review);box.replaceChildren();const text=document.createElement('p');text.textContent='Bağlantı 30 gün geçerli. Müşteriye kopyalayıp iletin:';const input=document.createElement('input');input.className='link-box';input.readOnly=true;input.value=url.href;input.setAttribute('aria-label','Müşteri yorum bağlantısı');input.addEventListener('click',()=>input.select());const copy=document.createElement('button');copy.textContent='KOPYALA';copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(url.href);copy.textContent='KOPYALANDI';}catch{input.select();$('panelMesaj').textContent='Bağlantı seçildi. Ctrl+C ile kopyalayın.';}});box.append(text,input,copy);}catch(e){$('panelMesaj').textContent=hataYaz(e);}finally{b.disabled=false;}}
 async function yorumlariGetir(){if(!oturumAcik)return;try{const rows=await rpc('sk_admin_yorumlar');if(!oturumAcik)return;$('adminYorumlar').innerHTML=rows.length?rows.map(r=>`<article class="randevu"><strong>${guvenli(r.ad)} · ${Number(r.puan)}/5</strong><p>${guvenli(r.metin)}</p><p>${guvenli(r.durum)} · ${tarihYaz(r.tarih)}</p><button data-id="${guvenli(r.id)}" data-state="onaylandi">YAYINLA</button><button data-id="${guvenli(r.id)}" data-state="reddedildi">YAYINDAN KALDIR / REDDET</button></article>`).join(''):'<p>Henüz yorum bulunmuyor.</p>';}catch(e){$('adminYorumlar').textContent=hataYaz(e);}}
 $('adminYorumlar').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;b.disabled=true;try{await rpc('sk_yorum_durum',{p_id:b.dataset.id,p_durum:b.dataset.state});$('panelMesaj').textContent='Yorum güncellendi.';await yorumlariGetir();}catch(e){$('panelMesaj').textContent=hataYaz(e);}finally{b.disabled=false;}});
-function bildirimleriBaslat(){if(randevuKanali)supabaseClient.removeChannel(randevuKanali);randevuKanali=supabaseClient.channel('sk-admin-randevular').on('postgres_changes',{event:'*',schema:'public',table:'randevular'},()=>{if(oturumAcik)randevulariGetir();}).subscribe();}
-async function yenile(){await Promise.all([randevulariGetir(),yorumlariGetir()]);}
-async function bildirimSesiniAc(){try{audioCtx??=new(window.AudioContext||window.webkitAudioContext)();await audioCtx.resume();sesAktif=!sesAktif;$('sesBtn').textContent=sesAktif?'🔔 BİLDİRİM SESİ AÇIK':'🔕 BİLDİRİM SESİ KAPALI';if(sesAktif)bildirimSesiCal();}catch{$('panelMesaj').textContent='Tarayıcı ses izni vermedi.';}}
-function bildirimSesiCal(){if(!sesAktif||!audioCtx||audioCtx.state!=='running')return;const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=880;g.gain.setValueAtTime(.25,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.5);o.start();o.stop(audioCtx.currentTime+.5);o.onended=()=>{o.disconnect();g.disconnect();};}
+function bildirimleriBaslat(){if(randevuKanali)supabaseClient.removeChannel(randevuKanali);randevuKanali=supabaseClient.channel('sk-admin-randevular').on('postgres_changes',{event:'*',schema:'public',table:'randevular'},()=>{if(oturumAcik){randevulariGetir();alarmDurumunuYenile();}}).subscribe();}
+async function yenile(){await Promise.all([randevulariGetir(),yorumlariGetir(),alarmDurumunuYenile()]);}
+// Tek bir AudioBufferSource döngüsü: sekme arka planda olsa da JS zamanlayıcısına bağlı değildir.
+let alarmKaynak=null,alarmKazanc=null,alarmBuffer=null,testKaynak=null;
+let bekleyenSayisi=null,alarmSorgu=0,sesSeviyesi=1;
+const panelBasligi=document.title;
+try{const v=Number(localStorage.getItem('sk-alarm-volume'));if(v>=30&&v<=100)sesSeviyesi=v/100;}catch{}
+$('sesSeviyesi').value=String(Math.round(sesSeviyesi*100));
+$('sesYuzde').textContent=$('sesSeviyesi').value+'%';
+function alarmTamponu(){
+ if(alarmBuffer)return alarmBuffer;
+ const rate=audioCtx.sampleRate;alarmBuffer=audioCtx.createBuffer(1,Math.ceil(rate*2.2),rate);
+ const a=alarmBuffer.getChannelData(0);
+ [0,.28,.66,.94,1.32,1.60].forEach((start,j)=>{const f=j%2?1318.51:1046.5,len=.23;
+  for(let i=0;i<Math.floor(rate*len);i++){const t=i/rate,e=Math.min(1,t/.008,(len-t)/.025);a[Math.floor(start*rate)+i]=.84*e*(.8*Math.sin(2*Math.PI*f*t)+.2*Math.sin(4*Math.PI*f*t));}
+ });return alarmBuffer;
+}
+function sesKaynakDurdur(source){if(!source)return;try{source.stop();}catch{}source.disconnect();}
+function alarmiDurdur(){const s=alarmKaynak;alarmKaynak=null;sesKaynakDurdur(s);}
+function alarmiEsitle(){
+ const shouldPlay=oturumAcik&&sesAktif&&bekleyenSayisi>0&&audioCtx?.state==='running';
+ if(shouldPlay&&!alarmKaynak){sesKaynakDurdur(testKaynak);testKaynak=null;const s=audioCtx.createBufferSource();s.buffer=alarmTamponu();s.loop=true;s.connect(alarmKazanc);alarmKaynak=s;s.start();}
+ if(!shouldPlay)alarmiDurdur();alarmGorunumu();
+}
+function alarmGorunumu(){
+ const waiting=oturumAcik&&bekleyenSayisi>0,ready=sesAktif&&audioCtx?.state==='running';
+ $('sesBtn').textContent=ready?'ALARM AÇIK · SESİ DENE':'ALARM SESİNİ AÇ';
+ $('alarmDurum').textContent=waiting?(ready?`${bekleyenSayisi} randevu onay bekliyor. Son talep onaylanana veya iptal edilene kadar alarm çalar.`:`${bekleyenSayisi} randevu bekliyor! Alarm sesini aç düğmesine basın.`):(ready?'Alarm hazır. Yeni randevu gelince siz işlem yapana kadar çalar.':'Ses için bu sayfada Alarm Sesini Aç düğmesine bir kez basın.');
+ $('alarmAlan').classList.toggle('alarm-var',waiting);
+ document.title=waiting?`(${bekleyenSayisi}) YENİ RANDEVU · Siyah Makas`:panelBasligi;
+}
+async function bildirimSesiniAc(){
+ try{
+  if(!audioCtx||audioCtx.state==='closed'){
+   audioCtx=new(window.AudioContext||window.webkitAudioContext)();alarmBuffer=null;
+   alarmKazanc=audioCtx.createGain();alarmKazanc.gain.value=sesSeviyesi;alarmKazanc.connect(audioCtx.destination);
+   audioCtx.onstatechange=()=>{if(audioCtx.state!=='running'){alarmiDurdur();}else if(sesAktif){alarmiEsitle();}alarmGorunumu();};
+  }
+  await audioCtx.resume();sesAktif=true;alarmiEsitle();
+  if(!alarmKaynak&&oturumAcik){sesKaynakDurdur(testKaynak);const s=audioCtx.createBufferSource();s.buffer=alarmTamponu();s.connect(alarmKazanc);testKaynak=s;s.onended=()=>{s.disconnect();if(testKaynak===s)testKaynak=null;};s.start();}
+  await alarmDurumunuYenile();
+ }catch{$('alarmDurum').textContent='Ses başlatılamadı. Tarayıcı ses iznini kontrol edip Alarm Sesini Aç düğmesine tekrar basın.';}
+}
+async function alarmDurumunuYenile(){
+ if(!oturumAcik)return;const request=++alarmSorgu;
+ try{const data=await rpc('sk_admin_liste',{p_filtre:'bekliyor',p_arama:'',p_tarih:null,p_sayfa:0});
+  if(request!==alarmSorgu||!oturumAcik)return;
+  const n=Number(data.total);if(!Number.isSafeInteger(n)||n<0)throw Error('Geçersiz talep sayısı');
+  bekleyenSayisi=n;alarmiEsitle();
+ }catch{if(request===alarmSorgu&&oturumAcik)$('alarmDurum').textContent='Bekleyen randevular güncellenemedi. Son bilinen alarm durumu korunuyor; bağlantıyı kontrol edin.';}
+}
+$('sesSeviyesi').addEventListener('input',()=>{
+ sesSeviyesi=Math.max(.3,Math.min(1,Number($('sesSeviyesi').value)/100));$('sesYuzde').textContent=Math.round(sesSeviyesi*100)+'%';
+ if(alarmKazanc&&audioCtx)alarmKazanc.gain.setTargetAtTime(sesSeviyesi,audioCtx.currentTime,.02);
+ try{localStorage.setItem('sk-alarm-volume',String(Math.round(sesSeviyesi*100)));}catch{}
+});
+window.addEventListener('pagehide',()=>{alarmiDurdur();sesKaynakDurdur(testKaynak);testKaynak=null;});
+window.addEventListener('pageshow',()=>{if(oturumAcik)alarmDurumunuYenile();});
+alarmGorunumu();
+
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&oturumAcik)yenile();});
 if(supabaseClient){supabaseClient.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')paneliKapat();});supabaseClient.auth.getSession().then(({data,error})=>{if(error)$('mesaj').textContent=hataYaz(error);else if(data.session)paneliAc();});}else{$('mesaj').textContent='Bağlantı bileşeni yüklenemedi. Sayfayı yenileyin.';}
 
