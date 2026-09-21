@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siyah Makas | Yönetim Paneli</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #080808;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1100px;
+            margin: 60px auto;
+        }
+
+        h1 {
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #888;
+            margin-bottom: 35px;
+        }
+
+        .login-box {
+            max-width: 450px;
+            background: #111;
+            border: 1px solid #333;
+            padding: 30px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: #161616;
+            border: 1px solid #444;
+            color: white;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: 0;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: white;
+            color: black;
+        }
+
+        #panel {
+            display: none;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+.filtreler {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.filtreler button {
+    background: #111;
+    color: #ccc;
+    border: 1px solid #333;
+    padding: 12px 18px;
+    transition: 0.2s;
+}
+
+.filtreler button:hover {
+    background: #222;
+    color: white;
+    border-color: #666;
+}
+        .logout-btn {
+            background: #222;
+            color: white;
+            border: 1px solid #444;
+        }
+
+        .randevu {
+            background: #111;
+            border: 1px solid #333;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .randevu p {
+            margin: 8px 0;
+            color: #ccc;
+        }
+
+        .randevu strong {
+            color: white;
+        }
+
+        .durum {
+            display: inline-block;
+            padding: 6px 10px;
+            border: 1px solid #555;
+            margin: 8px 0 15px;
+        }
+.durum.bekliyor {
+    border-color: #c7a500;
+    color: #ffd84d;
+}
+
+.durum.onaylandi {
+    border-color: #2d8a4b;
+    color: #6ee7a0;
+}
+
+.durum.iptal {
+    border-color: #8a2d2d;
+    color: #ff7a7a;
+}
+        .onayla {
+    background: #111;
+    color: #6ee7a0;
+    border: 1px solid #2d8a4b;
+    margin-right: 8px;
+    transition: 0.2s;
+}
+
+.onayla:hover {
+    background: #173522;
+    color: white;
+}
+        
+
+        .iptal {
+            background: #351313;
+            color: white;
+        }
+
+        #mesaj {
+            margin-top: 15px;
+            color: #aaa;
+        }
+    
+[hidden]{display:none!important}input,select{font-size:16px}button{min-height:44px;margin:4px 2px}button:disabled{opacity:.5;cursor:not-allowed}
+.topbar{flex-wrap:wrap;gap:15px}.randevu{overflow-wrap:anywhere;line-height:1.6}.randevu p{white-space:pre-wrap}.randevu a{color:#9dcfff;text-decoration:underline}
+#panelMesaj,#baglantiDurum,#ozet{line-height:1.6;color:#ddd}.sayfalama{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:24px 0 50px}
+:focus-visible{outline:2px solid #f4c542;outline-offset:3px}.filtreler button[aria-pressed="true"]{border-color:#f4c542;color:#f4c542}
+.link-box{width:100%;font-size:13px;margin-top:10px}.durum.tamamlandi{color:#95c9ff}.durum.gelmedi{color:#ffb181}
+@media(max-width:600px){.container{margin:24px auto}h1{font-size:26px;letter-spacing:1px}.login-box{padding:22px}.randevu{padding:16px}.filtreler button{flex:1 1 42%;font-size:12px;padding:10px}.topbar .subtitle{margin-bottom:5px}}
+#alarmAlan{padding:20px;border:1px solid #555;margin:20px 0;background:#151515}#alarmAlan.alarm-var{border:2px solid #ffc34a;background:#2b200c}#alarmAlan label{display:block;margin-top:12px}#sesSeviyesi{max-width:360px;padding:0;accent-color:#ffc34a}#alarmDurum{line-height:1.65;color:#ffe09b}.alarm-not{color:#bbb;font-size:13px;line-height:1.6}#sesYuzde{margin-left:8px}</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div id="login">
+        <h1>SİYAH MAKAS</h1>
+        <div class="subtitle">YÖNETİM PANELİ</div>
+
+        <form class="login-box" id="loginForm">
+            <label for="email">E-posta</label><input type="email" id="email" placeholder="E-posta" autocomplete="username" required>
+            <label for="password">Şifre</label><input type="password" id="password" placeholder="Şifre" autocomplete="current-password" required>
+
+            <button class="login-btn" id="loginBtn" type="submit">
+                GİRİŞ YAP
+            </button>
+
+            <div id="mesaj" role="status"></div>
+        </form>
+    </div>
+
+    <div id="panel">
+
+        <div class="topbar">
+            <div>
+                <h1>RANDEVULAR</h1>
+                <div class="subtitle">Siyah Makas Yönetim Paneli</div>
+            </div>
+
+            <button class="logout-btn" onclick="cikisYap()">
+                ÇIKIŞ YAP
+            </button>
+        </div>
+<p id="panelMesaj" role="status" aria-live="polite"></p><p id="ozet"></p>
+<div class="filtreler">
+    <button onclick="filtrele('gelecek')">YAKLAŞAN</button><button onclick="filtrele('gecmis')">GEÇMİŞ</button><button onclick="filtrele('tumu')">TÜMÜ</button>
+    <button onclick="filtrele('bugun')">BUGÜN</button>
+    <button onclick="filtrele('bekliyor')">BEKLEYEN</button>
+    <button onclick="filtrele('onaylandi')">ONAYLANAN</button>
+    <button onclick="filtrele('iptal')">İPTAL EDİLEN</button><button onclick="filtrele('tamamlandi')">TAMAMLANAN</button>
+</div>
+<label for="arama">Müşteri veya telefon ara</label><input id="arama" type="search" placeholder="Ad veya telefon"><label for="tarihFiltre">Tarihe göre filtrele</label><input id="tarihFiltre" type="date"><button type="button" onclick="filtreleriTemizle()">FİLTRELERİ TEMİZLE</button>
+<section id="alarmAlan" aria-label="Randevu alarmı"><button onclick="bildirimSesiniAc()" class="ses-btn" id="sesBtn">ALARM SESİNİ AÇ</button><label for="sesSeviyesi">Alarm sesi <output id="sesYuzde" for="sesSeviyesi">100%</output></label><input type="range" id="sesSeviyesi" min="30" max="100" value="100" step="5"><p id="alarmDurum" role="status" aria-live="polite"></p><button type="button" onclick="filtreleriTemizle();filtrele('bekliyor')">BEKLEYEN TALEPLERİ GÖSTER</button><p class="alarm-not">Paneli açık tutun ve cihazın sesini yükseltin. Ses, cihazınızın ses düzeyine bağlıdır.</p></section>
+        <button onclick="yenile()">YENİLE</button><p id="baglantiDurum" role="status"></p><div id="randevular">
+            Randevular yükleniyor...
+        </div>
+
+        <div class="sayfalama"><button id="onceki" onclick="sayfaDegistir(-1)">ÖNCEKİ</button><span id="sayfaBilgi"></span><button id="sonraki" onclick="sayfaDegistir(1)">SONRAKİ</button></div>
+<h2>MÜŞTERİ YORUMLARI</h2><p>Yorumlar, onayınızdan sonra sitede görünür.</p><div id="adminYorumlar"></div>
+    </div>
+
+</div>
+
+<script>
+'use strict';
+const SUPABASE_URL = 'https://qxmgxmjhlbkdnejxpccl.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_bfAlTLrCqcT0y-6A_w9NzQ_bnGtVYcJ';
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+const $ = id => document.getElementById(id);
+function guvenli(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function trSimdi(){const p=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Istanbul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).map(x=>[x.type,x.value]));return {tarih:`${p.year}-${p.month}-${p.day}`,saat:`${p.hour}:${p.minute}`};}
+function tarihYaz(s){return /^\d{4}-\d{2}-\d{2}$/.test(s)?s.split('-').reverse().join('/'):s;}
+function telefonDuzenle(s){let n=s.replace(/[\s()+.-]/g,'');if(n.startsWith('0090'))n=n.slice(4);else if(n.startsWith('90')&&n.length===12)n=n.slice(2);if(n.startsWith('0'))n=n.slice(1);return /^5\d{9}$/.test(n)?'0'+n:null;}
+const hataMetinleri={SK_SLOT:'Bu saat az önce doldu. Lütfen başka bir saat seçin.',SK_PHONE:'Geçerli bir Türkiye cep telefonu numarası yazın.',SK_NAME:'Adınızı 2–80 karakter arasında yazın.',SK_DATE:'Geçerli ve ileri bir tarih seçin. En fazla 90 gün sonrası için randevu alabilirsiniz.',SK_CLOSED:'Pazar günleri kapalıyız.',SK_TIME:'Bu saat için randevu alınamaz.',SK_SERVICE:'Listeden bir hizmet seçin.',SK_RATE:'Çok sık talep gönderildi. Bir süre sonra tekrar deneyin veya bizi arayın.',SK_DUPLICATE:'Bu telefon için aynı gün zaten aktif bir randevu var. Değişiklik için işletmeyle iletişime geçin.',SK_BOT:'Talep gönderilemedi. Sayfayı yenileyip tekrar deneyin.',SK_AUTH:'Bu hesap yönetim paneline yetkili değil.',SK_NOT_FOUND:'Kayıt bulunamadı veya başka bir cihazda değiştirildi. Listeyi yenileyin.',SK_STATE:'Bu işlem randevunun mevcut durumunda yapılamıyor.',SK_REVIEW:'Yorum bağlantısı geçersiz, süresi dolmuş veya daha önce kullanılmış.',SK_REVIEW_TEXT:'Ad, 1–5 yıldız ve 5–300 karakterlik yorum gereklidir.'};
+function hataYaz(e){for(const [k,v] of Object.entries(hataMetinleri))if((e?.message||'').includes(k))return v;if(e?.code==='23505')return hataMetinleri.SK_SLOT;if(['PGRST202','42883'].includes(e?.code))return 'Sistem kurulumu henüz tamamlanmamış. Lütfen işletmeyle iletişime geçin.';return 'İşlem doğrulanamadı. İnternet bağlantınızı kontrol edip tekrar deneyin.';}
+async function rpc(name,args={}){if(!supabaseClient)throw Error('Bağlantı yüklenemedi');const {data,error}=await supabaseClient.rpc(name,args);if(error)throw error;return data;}
+let filtre='gelecek',sayfa=0,toplam=0,listeIstegi=0,oturumAcik=false,yenileTimer=null;
+let audioCtx=null,sesAktif=false,islemde=false,randevuKanali=null;
+const durumlar={bekliyor:'BEKLİYOR',onaylandi:'ONAYLANDI',iptal:'İPTAL EDİLDİ',tamamlandi:'TAMAMLANDI',gelmedi:'GELMEDİ'};
+$('loginForm').addEventListener('submit',girisYap);
+async function girisYap(e){e?.preventDefault();$('loginBtn').disabled=true;$('mesaj').textContent='Giriş yapılıyor…';try{if(!supabaseClient)throw Error();const {error}=await supabaseClient.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;$('password').value='';await paneliAc();}catch(e){$('mesaj').textContent='Giriş yapılamadı. E-posta, şifre ve bağlantınızı kontrol edin.';}finally{$('loginBtn').disabled=false;}}
+async function paneliAc(){try{const allowed=await rpc('sk_admin_mi');if(!allowed){$('mesaj').textContent=hataMetinleri.SK_AUTH;await supabaseClient.auth.signOut();return;}oturumAcik=true;$('login').hidden=true;$('panel').style.display='block';$('panel').hidden=false;await yenile();bildirimleriBaslat();clearInterval(yenileTimer);yenileTimer=setInterval(()=>{if(oturumAcik){if(document.hidden)alarmDurumunuYenile();else yenile();}},15000);}catch(e){$('mesaj').textContent=hataYaz(e);}}
+function paneliKapat(){oturumAcik=false;++alarmSorgu;bekleyenSayisi=null;alarmiDurdur();sesKaynakDurdur(testKaynak);testKaynak=null;alarmGorunumu();if(randevuKanali){supabaseClient.removeChannel(randevuKanali);randevuKanali=null;}clearInterval(yenileTimer);yenileTimer=null;$('panel').hidden=true;$('login').hidden=false;$('randevular').replaceChildren();$('adminYorumlar').replaceChildren();}
+async function cikisYap(){try{const {error}=await supabaseClient.auth.signOut();if(error)throw error;paneliKapat();$('mesaj').textContent='Çıkış yapıldı.';}catch(e){$('panelMesaj').textContent='Çıkış yapılamadı. Tekrar deneyin.';}}
+function filtrele(value){filtre=value;sayfa=0;randevulariGetir();}
+function filtreleriTemizle(){$('arama').value='';$('tarihFiltre').value='';filtrele('gelecek');}
+let aramaTimer; $('arama').addEventListener('input',()=>{clearTimeout(aramaTimer);aramaTimer=setTimeout(()=>{sayfa=0;randevulariGetir();},300);});$('tarihFiltre').addEventListener('change',()=>{sayfa=0;randevulariGetir();});
+function sayfaDegistir(n){sayfa=Math.max(0,sayfa+n);randevulariGetir();}
+
+async function randevulariGetir(){if(!oturumAcik)return;const req=++listeIstegi;try{const data=await rpc('sk_admin_liste',{p_filtre:filtre,p_arama:$('arama').value.trim(),p_tarih:$('tarihFiltre').value||null,p_sayfa:sayfa});if(req!==listeIstegi||!oturumAcik)return;toplam=data.total;const rows=data.rows||[];if(!rows.length&&sayfa>0){sayfa--;return randevulariGetir();}$('ozet').textContent=`Bugün ${data.bugun} randevu · ${data.bekleyen} bekleyen talep · ${toplam} eşleşme`;
+
+$('randevular').innerHTML=rows.length?rows.map(kartHtml).join(''):'<p>Bu filtrede randevu bulunmuyor.</p>';$('sayfaBilgi').textContent=`Sayfa ${sayfa+1} / ${Math.max(1,Math.ceil(toplam/20))}`;$('onceki').disabled=sayfa===0;$('sonraki').disabled=(sayfa+1)*20>=toplam;document.querySelectorAll('.filtreler button').forEach(b=>b.setAttribute('aria-pressed',String(b.getAttribute('onclick').includes("'"+filtre+"'"))));$('baglantiDurum').textContent='Güncel · Panel açıkken 15 saniyede bir yenilenir.';
+}catch(e){if(req===listeIstegi){$('panelMesaj').textContent=hataYaz(e);$('baglantiDurum').textContent='Bağlantı kurulamadı. Gösterilen kayıtlar güncel olmayabilir.';}}}
+function kartHtml(r){const d=Object.hasOwn(durumlar,r.durum)?r.durum:'bekliyor',id=guvenli(String(r.id)),now=trSimdi(),past=`${r.tarih} ${r.saat.slice(0,5)}`<`${now.tarih} ${now.saat}`;let buttons='';const btn=(to,text,cls='onayla')=>`<button class="${cls}" data-id="${id}" data-old="${d}" data-to="${to}">${text}</button>`;
+if(d==='bekliyor'){if(!past)buttons+=btn('onaylandi','ONAYLA');buttons+=btn('iptal','İPTAL ET','iptal');}
+if(d==='onaylandi'){if(past)buttons+=btn('tamamlandi','TAMAMLANDI')+btn('gelmedi','GELMEDİ');else buttons+=btn('iptal','İPTAL ET','iptal');}
+if(d==='iptal'&&!past)buttons+=btn('bekliyor','TEKRAR BEKLEMEYE AL');
+if(d==='tamamlandi')buttons+=`<button data-review="${id}">YORUM BAĞLANTISI</button>`;
+const tel=telefonDuzenle(r.telefon||'');return `<article class="randevu"><p><strong>Müşteri:</strong> ${guvenli(r.musteri_adi)}</p><p><strong>Telefon:</strong> ${tel?`<a href="tel:${tel}">${guvenli(r.telefon)}</a>`:guvenli(r.telefon)}</p><p><strong>Hizmet:</strong> ${guvenli(r.hizmet)}</p><p><strong>Tarih:</strong> ${tarihYaz(r.tarih)} · ${guvenli(r.saat.slice(0,5))}${past?' · Geçmiş':''}</p><span class="durum ${d}">${durumlar[d]}</span><div>${buttons}</div><div id="link-${id}"></div></article>`;}
+$('randevular').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b||islemde)return;if(b.dataset.to)await durumDegistir(b);if(b.dataset.review)await yorumBaglantisi(b);});
+async function durumDegistir(b){if(b.dataset.to==='iptal'&&!confirm('Bu randevu iptal edilsin mi?'))return;islemde=true;b.disabled=true;try{await rpc('sk_durum_degistir',{p_id:b.dataset.id,p_eski:b.dataset.old,p_yeni:b.dataset.to});$('panelMesaj').textContent='Randevu güncellendi.';await Promise.all([randevulariGetir(),alarmDurumunuYenile()]);}catch(e){$('panelMesaj').textContent=hataYaz(e);}finally{islemde=false;b.disabled=false;}}
+async function yorumBaglantisi(b){b.disabled=true;try{const token=await rpc('sk_yorum_daveti',{p_id:b.dataset.review});const url=new URL('index.html',location.href);url.searchParams.set('yorum',token);url.hash='yorumlar';const box=$('link-'+b.dataset.review);box.replaceChildren();const text=document.createElement('p');text.textContent='Bağlantı 30 gün geçerli. Müşteriye kopyalayıp iletin:';const input=document.createElement('input');input.className='link-box';input.readOnly=true;input.value=url.href;input.setAttribute('aria-label','Müşteri yorum bağlantısı');input.addEventListener('click',()=>input.select());const copy=document.createElement('button');copy.textContent='KOPYALA';copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(url.href);copy.textContent='KOPYALANDI';}catch{input.select();$('panelMesaj').textContent='Bağlantı seçildi. Ctrl+C ile kopyalayın.';}});box.append(text,input,copy);}catch(e){$('panelMesaj').textContent=hataYaz(e);}finally{b.disabled=false;}}
+async function yorumlariGetir(){if(!oturumAcik)return;try{const rows=await rpc('sk_admin_yorumlar');if(!oturumAcik)return;$('adminYorumlar').innerHTML=rows.length?rows.map(r=>`<article class="randevu"><strong>${guvenli(r.ad)} · ${Number(r.puan)}/5</strong><p>${guvenli(r.metin)}</p><p>${guvenli(r.durum)} · ${tarihYaz(r.tarih)}</p><button data-id="${guvenli(r.id)}" data-state="onaylandi">YAYINLA</button><button data-id="${guvenli(r.id)}" data-state="reddedildi">YAYINDAN KALDIR / REDDET</button></article>`).join(''):'<p>Henüz yorum bulunmuyor.</p>';}catch(e){$('adminYorumlar').textContent=hataYaz(e);}}
+$('adminYorumlar').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;b.disabled=true;try{await rpc('sk_yorum_durum',{p_id:b.dataset.id,p_durum:b.dataset.state});$('panelMesaj').textContent='Yorum güncellendi.';await yorumlariGetir();}catch(e){$('panelMesaj').textContent=hataYaz(e);}finally{b.disabled=false;}});
+function bildirimleriBaslat(){if(randevuKanali)supabaseClient.removeChannel(randevuKanali);randevuKanali=supabaseClient.channel('sk-admin-randevular').on('postgres_changes',{event:'*',schema:'public',table:'randevular'},()=>{if(oturumAcik){randevulariGetir();alarmDurumunuYenile();}}).subscribe();}
+async function yenile(){await Promise.all([randevulariGetir(),yorumlariGetir(),alarmDurumunuYenile()]);}
+// Tek bir AudioBufferSource döngüsü: sekme arka planda olsa da JS zamanlayıcısına bağlı değildir.
+let alarmKaynak=null,alarmKazanc=null,alarmBuffer=null,testKaynak=null;
+let bekleyenSayisi=null,alarmSorgu=0,sesSeviyesi=1;
+const panelBasligi=document.title;
+try{const v=Number(localStorage.getItem('sk-alarm-volume'));if(v>=30&&v<=100)sesSeviyesi=v/100;}catch{}
+$('sesSeviyesi').value=String(Math.round(sesSeviyesi*100));
+$('sesYuzde').textContent=$('sesSeviyesi').value+'%';
+function alarmTamponu(){
+ if(alarmBuffer)return alarmBuffer;
+ const rate=audioCtx.sampleRate;alarmBuffer=audioCtx.createBuffer(1,Math.ceil(rate*2.2),rate);
+ const a=alarmBuffer.getChannelData(0);
+ [0,.28,.66,.94,1.32,1.60].forEach((start,j)=>{const f=j%2?1318.51:1046.5,len=.23;
+  for(let i=0;i<Math.floor(rate*len);i++){const t=i/rate,e=Math.min(1,t/.008,(len-t)/.025);a[Math.floor(start*rate)+i]=.84*e*(.8*Math.sin(2*Math.PI*f*t)+.2*Math.sin(4*Math.PI*f*t));}
+ });return alarmBuffer;
+}
+function sesKaynakDurdur(source){if(!source)return;try{source.stop();}catch{}source.disconnect();}
+function alarmiDurdur(){const s=alarmKaynak;alarmKaynak=null;sesKaynakDurdur(s);}
+function alarmiEsitle(){
+ const shouldPlay=oturumAcik&&sesAktif&&bekleyenSayisi>0&&audioCtx?.state==='running';
+ if(shouldPlay&&!alarmKaynak){sesKaynakDurdur(testKaynak);testKaynak=null;const s=audioCtx.createBufferSource();s.buffer=alarmTamponu();s.loop=true;s.connect(alarmKazanc);alarmKaynak=s;s.start();}
+ if(!shouldPlay)alarmiDurdur();alarmGorunumu();
+}
+function alarmGorunumu(){
+ const waiting=oturumAcik&&bekleyenSayisi>0,ready=sesAktif&&audioCtx?.state==='running';
+ $('sesBtn').textContent=ready?'ALARM AÇIK · SESİ DENE':'ALARM SESİNİ AÇ';
+ $('alarmDurum').textContent=waiting?(ready?`${bekleyenSayisi} randevu onay bekliyor. Son talep onaylanana veya iptal edilene kadar alarm çalar.`:`${bekleyenSayisi} randevu bekliyor! Alarm sesini aç düğmesine basın.`):(ready?'Alarm hazır. Yeni randevu gelince siz işlem yapana kadar çalar.':'Ses için bu sayfada Alarm Sesini Aç düğmesine bir kez basın.');
+ $('alarmAlan').classList.toggle('alarm-var',waiting);
+ document.title=waiting?`(${bekleyenSayisi}) YENİ RANDEVU · Siyah Makas`:panelBasligi;
+}
+async function bildirimSesiniAc(){
+ try{
+  if(!audioCtx||audioCtx.state==='closed'){
+   audioCtx=new(window.AudioContext||window.webkitAudioContext)();alarmBuffer=null;
+   alarmKazanc=audioCtx.createGain();alarmKazanc.gain.value=sesSeviyesi;alarmKazanc.connect(audioCtx.destination);
+   audioCtx.onstatechange=()=>{if(audioCtx.state!=='running'){alarmiDurdur();}else if(sesAktif){alarmiEsitle();}alarmGorunumu();};
+  }
+  await audioCtx.resume();sesAktif=true;alarmiEsitle();
+  if(!alarmKaynak&&oturumAcik){sesKaynakDurdur(testKaynak);const s=audioCtx.createBufferSource();s.buffer=alarmTamponu();s.connect(alarmKazanc);testKaynak=s;s.onended=()=>{s.disconnect();if(testKaynak===s)testKaynak=null;};s.start();}
+  await alarmDurumunuYenile();
+ }catch{$('alarmDurum').textContent='Ses başlatılamadı. Tarayıcı ses iznini kontrol edip Alarm Sesini Aç düğmesine tekrar basın.';}
+}
+async function alarmDurumunuYenile(){
+ if(!oturumAcik)return;const request=++alarmSorgu;
+ try{const data=await rpc('sk_admin_liste',{p_filtre:'bekliyor',p_arama:'',p_tarih:null,p_sayfa:0});
+  if(request!==alarmSorgu||!oturumAcik)return;
+  const n=Number(data.total);if(!Number.isSafeInteger(n)||n<0)throw Error('Geçersiz talep sayısı');
+  bekleyenSayisi=n;alarmiEsitle();
+ }catch{if(request===alarmSorgu&&oturumAcik)$('alarmDurum').textContent='Bekleyen randevular güncellenemedi. Son bilinen alarm durumu korunuyor; bağlantıyı kontrol edin.';}
+}
+$('sesSeviyesi').addEventListener('input',()=>{
+ sesSeviyesi=Math.max(.3,Math.min(1,Number($('sesSeviyesi').value)/100));$('sesYuzde').textContent=Math.round(sesSeviyesi*100)+'%';
+ if(alarmKazanc&&audioCtx)alarmKazanc.gain.setTargetAtTime(sesSeviyesi,audioCtx.currentTime,.02);
+ try{localStorage.setItem('sk-alarm-volume',String(Math.round(sesSeviyesi*100)));}catch{}
+});
+window.addEventListener('pagehide',()=>{alarmiDurdur();sesKaynakDurdur(testKaynak);testKaynak=null;});
+window.addEventListener('pageshow',()=>{if(oturumAcik)alarmDurumunuYenile();});
+alarmGorunumu();
+
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&oturumAcik)yenile();});
+if(supabaseClient){supabaseClient.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')paneliKapat();});supabaseClient.auth.getSession().then(({data,error})=>{if(error)$('mesaj').textContent=hataYaz(error);else if(data.session)paneliAc();});}else{$('mesaj').textContent='Bağlantı bileşeni yüklenemedi. Sayfayı yenileyin.';}
+
+</script>
+</body></html>
